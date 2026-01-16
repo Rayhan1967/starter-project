@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clear LocalStorage - Fix Login Issue</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #333;
+            margin-top: 0;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            margin: 10px 0;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #5568d3;
+        }
+
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🔧 Fix Login/Register Issue</h1>
+        <p>Klik tombol di bawah untuk membersihkan localStorage dan memperbaiki masalah login/register.</p>
+
+        <button onclick="clearStorage()">🗑️ Clear All Storage</button>
+        <button onclick="showStorageInfo()">📊 Show Storage Info</button>
+        <button onclick="goToApp()">🏠 Go to App</button>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        function clearStorage() {
+            try {
+                // Get current storage info
+                const beforeKeys = Object.keys(localStorage);
+
+                // Clear localStorage
+                localStorage.clear();
+
+                // Clear sessionStorage
+                sessionStorage.clear();
+
+                // Show result
+                const resultDiv = document.getElementById('result');
+                resultDiv.className = 'success';
+                resultDiv.innerHTML = `
+                    <h3>✅ Storage Cleared Successfully!</h3>
+                    <p><strong>Removed ${beforeKeys.length} items:</strong></p>
+                    <pre>${beforeKeys.length > 0 ? beforeKeys.join('\n') : 'No items found'}</pre>
+                    <p><strong>Next steps:</strong></p>
+                    <ol>
+                        <li>Click "Go to App" button below</li>
+                        <li>Try to register a new user</li>
+                        <li>Try to login with that user</li>
+                    </ol>
+                `;
+
+                console.log('✅ Storage cleared successfully');
+            } catch (error) {
+                const resultDiv = document.getElementById('result');
+                resultDiv.className = 'warning';
+                resultDiv.innerHTML = `
+                    <h3>⚠️ Error clearing storage</h3>
+                    <p>${error.message}</p>
+                `;
+                console.error('Error clearing storage:', error);
+            }
+        }
+
+        function showStorageInfo() {
+            const keys = Object.keys(localStorage);
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = 'info';
+
+            if (keys.length === 0) {
+                resultDiv.innerHTML = `
+                    <h3>📊 Storage Info</h3>
+                    <p>✅ localStorage is empty</p>
+                    <p>You can now go to the app and try to login/register.</p>
+                `;
+            } else {
+                let storageData = {};
+                keys.forEach(key => {
+                    try {
+                        storageData[key] = JSON.parse(localStorage.getItem(key));
+                    } catch {
+                        storageData[key] = localStorage.getItem(key);
+                    }
+                });
+
+                resultDiv.innerHTML = `
+                    <h3>📊 Storage Info</h3>
+                    <p><strong>Found ${keys.length} items in localStorage:</strong></p>
+                    <pre>${JSON.stringify(storageData, null, 2)}</pre>
+                    <p>⚠️ If you see corrupted data, click "Clear All Storage" button.</p>
+                `;
+            }
+        }
+
+        function goToApp() {
+            window.location.href = '/';
+        }
+
+        // Show storage info on load
+        window.addEventListener('DOMContentLoaded', () => {
+            showStorageInfo();
+        });
+    </script>
+</body>
+
+</html>
